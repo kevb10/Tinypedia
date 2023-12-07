@@ -2,6 +2,7 @@
 
 import { getAnswer } from "./getter";
 import { useState } from "react";
+import { incrementRequestCount, isRateLimited } from "./ratelimit";
 
 export default function Main() {
   const [answer, setAnswer] = useState("");
@@ -10,6 +11,11 @@ export default function Main() {
   const [shouldDisableButton, setShouldDisableButton] = useState(false);
 
   async function handleFormSubmit(event: any) {
+    if (isRateLimited()) {
+      alert("Slow down lol. try again in 30 seconds.");
+      return;
+    }
+
     event.preventDefault();
     const question = event.target?.form.question.value;
     let currentAndPreviousQA = entireQuestion + question;
@@ -29,6 +35,7 @@ export default function Main() {
 
     const aiAnswer = await getAnswer(currentAndPreviousQA);
     setAnswer(aiAnswer);
+    incrementRequestCount();
   }
 
   function resetInput() {
