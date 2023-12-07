@@ -1,37 +1,79 @@
-import Link from "next/link";
+"use client";
 
-export default function HomePage() {
+import { getAnswer } from "./getter";
+import { useState } from "react";
+
+export default function Main() {
+  const [answer, setAnswer] = useState("");
+  const [entireQuestion, setEntireQuestion] = useState("");
+  const [age, setAge] = useState(12);
+  const [shouldDisableButton, setShouldDisableButton] = useState(false);
+
+  async function handleFormSubmit(event: any) {
+    event.preventDefault();
+    const question = event.target?.form.question.value;
+    let currentAndPreviousQA = entireQuestion + question;
+    if (!question) return;
+
+    if (answer) {
+      currentAndPreviousQA += `. Dumb it down for me like i'm ${age} years-old The previous answer is ${answer}. `;
+      setEntireQuestion(currentAndPreviousQA);
+      if (age >= 5) {
+        setAge(age / 2);
+        setShouldDisableButton(true);
+      }
+    } else {
+      setAge(12);
+      setShouldDisableButton(false);
+    }
+
+    const aiAnswer = await getAnswer(currentAndPreviousQA);
+    setAnswer(aiAnswer);
+  }
+
+  function resetInput() {
+    setAnswer("");
+    setEntireQuestion("");
+    setShouldDisableButton(false);
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-        </h1>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
-          </Link>
+    <div className="h-full w-full bg-indigo-800 py-16 sm:py-24">
+      <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div className="relative isolate h-full min-h-screen w-full overflow-hidden  px-6 py-24 sm:px-24 xl:py-32">
+          <h2 className="mx-auto max-w-2xl text-center text-4xl font-bold tracking-tight text-white sm:text-4xl">
+            Tinypedia
+          </h2>
+          <p className="mx-auto text-center text-sm text-gray-300">
+            like Wikipedia but super simple to understand
+          </p>
+          <form className="mx-auto mt-10 flex max-w-md gap-x-4">
+            <label htmlFor="question" className="sr-only">
+              Ask me anything
+            </label>
+            <input
+              id="question"
+              name="question"
+              type="text"
+              required
+              className="bg-indigo/5 min-w-0 flex-auto rounded-md border-0 px-3.5 py-2 text-indigo-800 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white sm:text-sm sm:leading-6"
+              placeholder="Ask me anything"
+              onChange={resetInput}
+            />
+            <button
+              type="submit"
+              className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-800 shadow-sm hover:bg-indigo-100   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              onClick={handleFormSubmit}
+              disabled={shouldDisableButton}
+            >
+              {!answer ? "Ask" : `Explain Like I'm ${age}`}
+            </button>
+          </form>
+          <div className="w-max-xl pt-12 text-white">
+            <p className=" text-3xl">{answer}</p>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
