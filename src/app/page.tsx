@@ -44,7 +44,7 @@ export default function Main() {
           <h2 className="mx-auto max-w-2xl text-center text-4xl font-bold tracking-tight text-white sm:text-4xl">
             Tinypedia
           </h2>
-          <p className="mx-auto text-center text-sm text-gray-300">
+          <p className="mx-auto text-center text-sm text-indigo-200">
             like Wikipedia but super simple to understand
           </p>
           <form className="mx-auto mt-10 flex max-w-md gap-x-4">
