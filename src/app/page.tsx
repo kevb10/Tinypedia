@@ -6,8 +6,6 @@ import { incrementRequestCount, isRateLimited } from "./ratelimit";
 
 export default function Main() {
   const [answer, setAnswer] = useState("");
-  const [entireQuestion, setEntireQuestion] = useState("");
-  const [age, setAge] = useState(12);
   const [shouldDisableButton, setShouldDisableButton] = useState(false);
 
   async function handleFormSubmit(event: any) {
@@ -17,30 +15,21 @@ export default function Main() {
     }
 
     event.preventDefault();
-    const question = event.target?.form.question.value;
-    let currentAndPreviousQA = entireQuestion + question;
+    let question = event.target?.form.question.value;
     if (!question) return;
 
     if (answer) {
-      currentAndPreviousQA += `. Dumb it down for me like i'm ${age} years-old The previous answer is ${answer}. `;
-      setEntireQuestion(currentAndPreviousQA);
-      if (age >= 5) {
-        setAge(age / 2);
-        setShouldDisableButton(true);
-      }
-    } else {
-      setAge(12);
-      setShouldDisableButton(false);
+      question += `. Really dumb it down for me. Explain it like I'm 5 years-old. Don't be afraid to be a little silly and little funny.`;
+      setShouldDisableButton(true);
     }
 
-    const aiAnswer = await getAnswer(currentAndPreviousQA);
+    const aiAnswer = await getAnswer(question);
     setAnswer(aiAnswer);
     incrementRequestCount();
   }
 
   function resetInput() {
     setAnswer("");
-    setEntireQuestion("");
     setShouldDisableButton(false);
   }
 
@@ -73,11 +62,11 @@ export default function Main() {
               onClick={handleFormSubmit}
               disabled={shouldDisableButton}
             >
-              {!answer ? "Ask" : `Explain Like I'm ${age}`}
+              {!answer ? "Ask" : `Explain Like I'm 5`}
             </button>
           </form>
           <div className="w-max-xl pt-12 text-white">
-            <p className=" text-3xl">{answer}</p>
+            <p className="text-3xl">{answer}</p>
           </div>
         </div>
       </div>
