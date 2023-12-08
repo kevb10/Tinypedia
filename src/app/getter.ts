@@ -1,7 +1,7 @@
 
 import { type TinypediaAnswer } from "./type";
 
-const baseUrl = process.env.NEXT_PUBLIC_ENV === 'local' ? 'http://localhost:3001' : "https://tinypedia.vercel.app";
+const baseUrl = process.env.NEXT_PUBLIC_ENV === 'local' ? 'http://localhost:3001' : "https://www.tinypedia.co";
 
 export async function getAnswer(question: string): Promise<string> {
 	const response = await fetch(baseUrl + "/api/ai", {
