@@ -4,6 +4,19 @@ import { getAnswer } from "./getter";
 import { useState } from "react";
 import { incrementRequestCount, isRateLimited } from "./ratelimit";
 
+const exampleQuestions = [
+  {
+    question: "Why do we have to sleep?",
+    answer:
+      "We sleep to rest our bodies and brains, like recharging a battery so we can have fun and play all over again tomorrow!",
+  },
+  {
+    question: "Is santa real?",
+    answer:
+      "Well, some people believe that Santa is real because he brings joy and presents during Christmas, but others think he's just a fun story. What do you think?",
+  },
+];
+
 export default function Main() {
   const [answer, setAnswer] = useState("");
   const [shouldDisableButton, setShouldDisableButton] = useState(false);
@@ -65,9 +78,37 @@ export default function Main() {
               {!answer ? "Ask" : `Explain Like I'm 5`}
             </button>
           </form>
-          <div className="w-max-xl pt-12 text-white">
-            <p className="text-3xl">{answer}</p>
-          </div>
+          {!answer ? (
+            <div className="pt-10">
+              <p className="text-md text-center font-medium text-indigo-200">
+                People also asked:
+              </p>
+              <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
+                {exampleQuestions.map((example, index) => (
+                  <div
+                    key={index}
+                    className="relative flex items-center space-x-3 rounded-lg border border-indigo-500 bg-none px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-indigo-200"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <a href="#" className="focus:outline-none">
+                        <span className="absolute inset-0" aria-hidden="true" />
+                        <p className="text-md font-medium text-indigo-300">
+                          {example.question}
+                        </p>
+                        <p className="text-sm text-indigo-50">
+                          {example.answer}
+                        </p>
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="w-max-xl pt-12 text-white">
+              <p className="text-3xl">{answer}</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

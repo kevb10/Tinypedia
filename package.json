@@ -1,11 +1,11 @@
 {
-  "name": "Tinypedia",
+  "name": "tinypedia",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "lint": "next lint",
     "start": "next start"
   },
