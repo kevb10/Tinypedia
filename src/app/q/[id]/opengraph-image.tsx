@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import { Inter } from "next/font/google";
 
 // Route segment config
 export const runtime = "edge";
@@ -14,7 +13,11 @@ export const size = {
 export const contentType = "image/png";
 
 // Image generation
-export default async function Image({ params: { id } }: { params: { id: string } }) {
+export default async function Image({
+  params: { id },
+}: {
+  params: { id: string };
+}) {
   return new ImageResponse(
     (
       // ImageResponse JSX element
