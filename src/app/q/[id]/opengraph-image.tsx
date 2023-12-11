@@ -27,7 +27,7 @@ export default async function Image({ params: { id } }: { params: { id: string }
         className={`font-sans ${inter.variable}`}
         style={{
           fontSize: 128,
-          background: "white",
+          background: "blue",
           width: "100%",
           height: "100%",
           display: "flex",
