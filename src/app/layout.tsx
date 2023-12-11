@@ -23,7 +23,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>
-        {children}
+        <div className="h-full w-full bg-indigo-800 py-16 sm:py-24">
+          <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="relative isolate h-full min-h-screen w-full overflow-hidden  px-6 py-24 sm:px-24 xl:py-32">
+              <h2 className="mx-auto max-w-2xl text-center text-4xl font-bold tracking-tight text-white sm:text-4xl">
+                Tinypedia
+              </h2>
+              <p className="mx-auto text-center text-sm text-indigo-200">
+                like Wikipedia but super simple to understand
+              </p>
+              {children}
+            </div>
+          </div>
+        </div>
         <Analytics />
       </body>
     </html>

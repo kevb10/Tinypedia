@@ -4,22 +4,19 @@ import { getAnswer } from "./getter";
 import { useState } from "react";
 import { incrementRequestCount, isRateLimited } from "./ratelimit";
 
-const exampleQuestions = [
-  {
-    question: "Why do we have to sleep?",
-    answer:
-      "We sleep to rest our bodies and brains, like recharging a battery so we can have fun and play all over again tomorrow!",
-  },
-  {
-    question: "Is santa real?",
-    answer:
-      "Well, some people believe that Santa is real because he brings joy and presents during Christmas, but others think he's just a fun story. What do you think?",
-  },
-];
+import Card from "~/components/card";
+import useSWR from "swr";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { type QA } from "./types";
 
 export default function Main() {
   const [answer, setAnswer] = useState("");
+  const [question, setQuestion] = useState("");
   const [shouldDisableButton, setShouldDisableButton] = useState(false);
+
+  const { data: last4QAs } = useSWR("/api/db", (url) =>
+    fetch(url).then((res) => res.json()),
+  );
 
   async function handleFormSubmit(event: any) {
     if (isRateLimited()) {
@@ -28,89 +25,76 @@ export default function Main() {
     }
 
     event.preventDefault();
-    let question = event.target?.form.question.value;
+    const question = event.target?.form.question.value;
     if (!question) return;
 
-    if (answer) {
-      question += `. Really dumb it down for me. Explain it like I'm 5 years-old. Don't be afraid to be a little silly and little funny.`;
-      setShouldDisableButton(true);
-    }
+    // if (answer) {
+    //   question += `. Really dumb it down for me. Explain it like I'm 5 years-old. Don't be afraid to be a little silly and little funny.`;
+    //   setShouldDisableButton(true);
+    // }
 
     const aiAnswer = await getAnswer(question);
     setAnswer(aiAnswer);
     incrementRequestCount();
+    setShouldDisableButton(true);
+    await fetch("/api/db", {
+      method: "POST",
+      body: JSON.stringify({ question, answer: aiAnswer }),
+    });
   }
 
   function resetInput() {
     setAnswer("");
     setShouldDisableButton(false);
+    setQuestion("");
   }
 
   return (
-    <div className="h-full w-full bg-indigo-800 py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-        <div className="relative isolate h-full min-h-screen w-full overflow-hidden  px-6 py-24 sm:px-24 xl:py-32">
-          <h2 className="mx-auto max-w-2xl text-center text-4xl font-bold tracking-tight text-white sm:text-4xl">
-            Tinypedia
-          </h2>
-          <p className="mx-auto text-center text-sm text-indigo-200">
-            like Wikipedia but super simple to understand
+    <>
+      <form className="mx-auto mt-10 flex max-w-md gap-x-4">
+        <label htmlFor="question" className="sr-only">
+          Ask me anything
+        </label>
+        <button
+          type="button"
+          className="flex-none rounded-md text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          onClick={resetInput}
+        >
+          <XMarkIcon className="h-5 w-5" />
+        </button>
+        <input
+          id="question"
+          name="question"
+          type="text"
+          required
+          className="bg-indigo/5 min-w-0 flex-auto rounded-md border-0 px-3.5 py-2 text-indigo-800 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white sm:text-sm sm:leading-6"
+          value={question}
+          placeholder="Ask me anything"
+          onChange={(event) => setQuestion(event.target.value)}
+        />
+        <button
+          type="submit"
+          className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-800 shadow-sm hover:bg-indigo-100   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          onClick={handleFormSubmit}
+          disabled={shouldDisableButton}
+        >
+          {!answer ? "Ask" : `Explain Like I'm 5`}
+        </button>
+      </form>
+      {!answer ? (
+        <div className="pt-10">
+          <p className="text-md text-center font-medium text-indigo-200">
+            Recently asked:
           </p>
-          <form className="mx-auto mt-10 flex max-w-md gap-x-4">
-            <label htmlFor="question" className="sr-only">
-              Ask me anything
-            </label>
-            <input
-              id="question"
-              name="question"
-              type="text"
-              required
-              className="bg-indigo/5 min-w-0 flex-auto rounded-md border-0 px-3.5 py-2 text-indigo-800 shadow-sm ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-inset focus:ring-white sm:text-sm sm:leading-6"
-              placeholder="Ask me anything"
-              onChange={resetInput}
-            />
-            <button
-              type="submit"
-              className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-800 shadow-sm hover:bg-indigo-100   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              onClick={handleFormSubmit}
-              disabled={shouldDisableButton}
-            >
-              {!answer ? "Ask" : `Explain Like I'm 5`}
-            </button>
-          </form>
-          {!answer ? (
-            <div className="pt-10">
-              <p className="text-md text-center font-medium text-indigo-200">
-                People also asked:
-              </p>
-              <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
-                {exampleQuestions.map((example, index) => (
-                  <div
-                    key={index}
-                    className="relative flex items-center space-x-3 rounded-lg border border-indigo-500 bg-none px-6 py-5 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:border-indigo-200"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <a href="#" className="focus:outline-none">
-                        <span className="absolute inset-0" aria-hidden="true" />
-                        <p className="text-md font-medium text-indigo-300">
-                          {example.question}
-                        </p>
-                        <p className="text-sm text-indigo-50">
-                          {example.answer}
-                        </p>
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="w-max-xl pt-12 text-white">
-              <p className="text-3xl">{answer}</p>
-            </div>
-          )}
+          <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
+            {last4QAs?.map((qa: QA) => <Card {...qa} />)}
+          </div>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="w-max-xl pt-12 text-white">
+          <p className="text-3xl">{answer}</p>
+        </div>
+      )}
+    </>
   );
 }

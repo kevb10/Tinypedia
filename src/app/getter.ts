@@ -1,7 +1,6 @@
 
-import { type TinypediaAnswer } from "./type";
-
-const baseUrl = process.env.NEXT_PUBLIC_ENV === 'local' ? 'http://localhost:3001' : "https://www.tinypedia.co";
+import { type TinypediaAnswer } from "./types";
+import { baseUrl } from "./utils";
 
 export async function getAnswer(question: string): Promise<string> {
 	const response = await fetch(baseUrl + "/api/ai", {
