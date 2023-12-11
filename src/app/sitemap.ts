@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap[]> {
 		{
 			url: `https://www.tinypedia.co`,
 			lastModified: new Date(),
-			changeFrequency: 'daily',
+			changeFrequency: 'never',
 			priority: 1,
 		},
 		...urls
