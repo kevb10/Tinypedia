@@ -1,4 +1,10 @@
 import { ImageResponse } from "next/og";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 // Route segment config
 export const runtime = "edge";
@@ -13,20 +19,12 @@ export const size = {
 export const contentType = "image/png";
 
 // Image generation
-export default async function Image({
-  params: { id },
-}: {
-  params: { id: string };
-}) {
-  // Font
-  const interSemiBold = fetch(
-    new URL("./Inter-SemiBold.ttf", import.meta.url),
-  ).then((res) => res.arrayBuffer());
-
+export default async function Image({ params: { id } }: { params: { id: string } }) {
   return new ImageResponse(
     (
       // ImageResponse JSX element
       <div
+        className={`font-sans ${inter.variable}`}
         style={{
           fontSize: 128,
           background: "white",
@@ -45,14 +43,6 @@ export default async function Image({
       // For convenience, we can re-use the exported opengraph-image
       // size config to also set the ImageResponse's width and height.
       ...size,
-      fonts: [
-        {
-          name: "Inter",
-          data: await interSemiBold,
-          style: "normal",
-          weight: 400,
-        },
-      ],
     },
   );
 }
