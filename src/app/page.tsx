@@ -6,7 +6,7 @@ import { incrementRequestCount, isRateLimited } from "./ratelimit";
 
 import Card from "~/components/card";
 import useSWR from "swr";
-import { XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { type QA } from "./types";
 
 export default function Main() {
@@ -35,8 +35,8 @@ export default function Main() {
 
     const aiAnswer = await getAnswer(question);
     setAnswer(aiAnswer);
+    setQuestion("");
     incrementRequestCount();
-    setShouldDisableButton(true);
     await fetch("/api/db", {
       method: "POST",
       body: JSON.stringify({ question, answer: aiAnswer }),
@@ -55,13 +55,6 @@ export default function Main() {
         <label htmlFor="question" className="sr-only">
           Ask me anything
         </label>
-        <button
-          type="button"
-          className="flex-none rounded-md text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-          onClick={resetInput}
-        >
-          <XMarkIcon className="h-5 w-5" />
-        </button>
         <input
           id="question"
           name="question"
@@ -72,14 +65,26 @@ export default function Main() {
           placeholder="Ask me anything"
           onChange={(event) => setQuestion(event.target.value)}
         />
+        <div className="flex flex-inline gap-x-4">
         <button
           type="submit"
           className="flex-none rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-800 shadow-sm hover:bg-indigo-100   focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           onClick={handleFormSubmit}
           disabled={shouldDisableButton}
         >
-          {!answer ? "Ask" : `Explain Like I'm 5`}
+          Ask
         </button>
+        {!!answer || !!(answer && question) && (
+        <button
+          type="button"
+          className="flex flex-inline gap-x-2 p-2 items-center rounded-md text-white shadow-sm outline outline-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          onClick={resetInput}
+        >
+          <ArrowPathIcon className="h-5 w-5" />
+          Clear
+        </button>
+        )}
+        </div>
       </form>
       {!answer ? (
         <div className="pt-10">
@@ -87,7 +92,7 @@ export default function Main() {
             Recently asked:
           </p>
           <div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
-            {last4QAs?.map((qa: QA) => <Card {...qa} />)}
+            {last4QAs?.map((qa: QA, index: number) => <Card key={index} {...qa} />)}
           </div>
         </div>
       ) : (
